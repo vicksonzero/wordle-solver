@@ -1,30 +1,29 @@
 //@ts-check
 const { frequencyList } = require('../data/frequency');
 
-exports.name = 'naive solver with weighted choice';
+exports.name = 'naive solver with weighted choice, favoring against double letters';
 // Summary:
-// Solver: naive solver with weighted choice
-// Date: 2022_02_02T15_51_21
-// Total Guesses: 15110
-// Avg Guesses: 6.5270
+// Solver: naive solver with weighted choice, favoring against double letters
+// Date: 2022_02_02T16_23_11
+// Total Guesses: 12529
+// Avg Guesses: 5.4121
 // Shortest Guesses: 2
-// Longest Guesses: 23
+// Longest Guesses: 14
 // Fails: 0
+// Guess Limit Exceeded: 523
 // Guess Histogram:
-//   2: 11
-//   3: 64
-//   4: 239
-//   5: 420
-//   6: 506
-//   7: 439
-//   8: 299
-//   9: 164
-//   10: 94
-//   11: 47
-//   12: 21
-//   13: 9
+//   2: 31
+//   3: 205
+//   4: 465
+//   5: 636
+//   6: 455
+//   7: 276
+//   8: 134
+//   9: 72
+//   10: 28
+//   11: 8
+//   12: 4
 //   14: 1
-//   23: 1
 
 /**
  * @param {string} answer - 5-letter answer
@@ -149,19 +148,25 @@ function getChoice(choices, trial) {
     if (trial === 0) return 'salet';
     const scores = [];
     for (const choice of choices) {
-        scores.push('choice'.split('').map(c => (frequencyList.indexOf(c))).reduce(sum, 0));
+        let score = 0;
+        const usedLetter = {};
+        for (const c of choice.split('')) {
+            score += frequencyList.indexOf(c);
+            if (usedLetter[c]) {
+                score += 13;
+            }
+            usedLetter[c] = true;
+        }
+        scores.push(score);
     }
     let minIndex = 0;
-    let minScore = 0;
+    let minScore = Infinity;
     for (let i = 0; i < scores.length; i++) {
+        if (process.env.VERBOSE_SOLVER) console.log(`(Choice ${choices[i]}: ${scores[i]})`);
         if (minScore > scores[i]) {
             minIndex = i;
             minScore = scores[i];
         }
     }
     return choices[minIndex];
-}
-
-function sum(a, b) {
-    return a + b;
 }

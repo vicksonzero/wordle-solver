@@ -74,7 +74,7 @@ async function main() {
         ].join('\n');
     }
 
-
+    console.log(`Mode: ${process.env.MODE}`);
     if (process.env.MODE === 'all') {
         for (let i = 0; i < answers.length; i++) {
             const answer = answers[i];
