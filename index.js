@@ -68,6 +68,7 @@ async function main() {
             `Shortest Guesses: ${stats.minGuesses}`,
             `Longest Guesses: ${stats.maxGuesses}`,
             `Fails: ${stats.fails}`,
+            `Guess Limit Exceeded: ${Object.entries(stats.guessesDetails).filter(([k, v]) => Number(k) > 6).map(([k, v]) => v).reduce(sum)}`,
             `Guess Histogram:`,
             ...Object.entries(stats.guessesDetails).map(([k, v]) => `  ${k}: ${v}`)
         ].join('\n');
@@ -210,6 +211,10 @@ function lastWordOf(result = '') {
 
 function getDate() {
     return new Date().toISOString().split('.')[0].replace(/[-:]/g, '_');
+}
+
+function sum(a, b) {
+    return a + b;
 }
 
 async function writeFileExt(pathTemplate, data) {
