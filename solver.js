@@ -1,6 +1,22 @@
 //@ts-check
 exports.name = 'naive solver';
-exports.solver = function (answer, wordList, solveLine, trials) {
+// performance (2022_02_02T10_34_35):
+// {
+//     "minSteps": 2,
+//     "maxSteps": 102,
+//     "fails": 0,
+//     "totalSteps": 38582
+// }
+
+/**
+ * 
+ * @param {string} answer - 5-letter answer
+ * @param {string[]} wordList - a list of all available words to guess. `answer` is within that
+ * @param {(answer:string, guess:string)=>string} solveLine - function that takes the answer and the guess, and outputs a string of (0|1|2)
+ * @param {number} trials - max allowed trials before giving up
+ * @returns {string} comma-separated list of guesses, with the answer at the end of the list
+ */
+exports.solver = function (answer, wordList, solveLine, trials=6) {
     let result = [];
     // setup
 
@@ -14,6 +30,7 @@ exports.solver = function (answer, wordList, solveLine, trials) {
         /**
          * @type {Array<'0'|'1'|'2'>}
          */
+        // @ts-ignore
         const feedback = solveLine(answer, guess).split('');
 
         if (feedback.join('') === '22222') break;
