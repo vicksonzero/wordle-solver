@@ -1,4 +1,6 @@
 //@ts-check
+
+//#region head
 require('dotenv').config();
 if (process.env.SILENT) {
     process.env.VERBOSE = '';
@@ -27,39 +29,17 @@ perfObserver.observe({ entryTypes: ["measure"], buffered: true });
 
 
 const { solver, name: solverName } = require('./solver');
-const { write } = require('fs');
 
+//#endregion
 
-
+//#region body
 let answers = [];
 let allWords = []; // allowed guesses and answers mixed, sorted
-async function setup() {
-
-    // set up
-    answers = await (readFile(process.env.WORDLE_ANSWERS_PATH)
-        .then(b => b.toString())
-        .then(str => str.split('\n'))
-    );
-    if (process.env.VERBOSE) console.log(`answers: ${answers.length}`);
-    const allowed = await (readFile(process.env.WORDLE_ALLOWED_GUESSES_PATH)
-        .then(b => b.toString())
-        .then(str => str.split('\n'))
-    );
-    if (process.env.VERBOSE) console.log(`allowed: ${allowed.length}`);
-    allWords = [
-        ...answers,
-        ...allowed,
-    ];
-    if (process.env.VERBOSE) console.log(`allWords: ${allWords.length}`);
-    allWords.sort((a, b) => a.localeCompare(b));
-}
-
-
-
 
 async function main() {
     performance.mark("all-start");
     await setup();
+    // writeFileExt('./allWords.txt', allWords.join('\n'));
 
     const stats = {
         minSteps: allWords.length,
@@ -100,10 +80,33 @@ async function main() {
     performance.measure('all', "all-start", "all-end");
 }
 
+async function setup() {
+
+    // set up
+    answers = await (readFile(process.env.WORDLE_ANSWERS_PATH)
+        .then(b => b.toString())
+        .then(str => str.split('\n'))
+    );
+    if (process.env.VERBOSE) console.log(`answers: ${answers.length}`);
+    const allowed = await (readFile(process.env.WORDLE_ALLOWED_GUESSES_PATH)
+        .then(b => b.toString())
+        .then(str => str.split('\n'))
+    );
+    if (process.env.VERBOSE) console.log(`allowed: ${allowed.length}`);
+    allWords = [
+        ...answers,
+        ...allowed,
+    ];
+    if (process.env.VERBOSE) console.log(`allWords: ${allWords.length}`);
+    allWords.sort((a, b) => a.localeCompare(b));
+}
+//#endregion
+
+//#region runner
+
 
 function solve(answer, outPath, stats) {
     if (process.env.VERBOSE) console.log(`Solve: ${answer}`);
-    // writeFileExt('./allWords.txt', allWords.join('\n'));
 
     const measureKey = `${solverName}: ${answer}`;
     performance.mark("measure-start");
@@ -166,8 +169,10 @@ function solveLine(answer, guess) {
     if (process.env.VERBOSE) console.log(` - solveLine(${formatResult(answer)}, ${formatResult(guess)}) = ${formatResult(feedback)}`);
     return feedback.join('');
 }
+//#endregion
 
-// UTILS
+//#region utils
+
 
 function formatResult(result) {
     // 🟩🟨⬜ 210
@@ -193,5 +198,9 @@ async function writeFileExt(pathTemplate, data) {
     await writeFile(path, data);
     console.log(`Written to ${path}`);
 }
+
+//#endregion
+
+
 
 main();
