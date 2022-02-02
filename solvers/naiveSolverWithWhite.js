@@ -6,6 +6,7 @@ exports.name = 'naive solver with white';
 //     "maxGuesses": 23,
 //     "fails": 0,
 //     "totalGuesses": 23191,
+//     "duration": 42197.2543,
 //     "guessesDetails": {
 //         "2": 2,
 //         "3": 9,

@@ -51,18 +51,32 @@ async function main() {
 
     const stats = {
         solver: solverName,
+        date: fileNameDate,
         minGuesses: allWords.length,
         maxGuesses: 0,
         fails: 0,
         guessesDetails: {},
         totalGuesses: 0,
     };
+    function formatReport(stats) {
+        return [
+            `Summary:`,
+            `Solver: ${stats.solver}`,
+            `Date: ${stats.date}`,
+            `Total Guesses: ${stats.totalGuesses}`,
+            `Shortest Guesses: ${stats.minGuesses}`,
+            `Longest Guesses: ${stats.maxGuesses}`,
+            `Fails: ${stats.fails}`,
+            `Guess Histogram:`,
+            ...Object.entries(stats.guessesDetails).map(([k, v]) => `  ${k}: ${v}`)
+        ].join('\n');
+    }
 
 
     if (process.env.MODE === 'all') {
         for (let i = 0; i < answers.length; i++) {
             const answer = answers[i];
-            if ((i + 1) % 10 === 0) console.log(`${i + 1}/${answers.length}`);
+            if ((i + 1) % 100 === 0) console.log(`${i + 1}/${answers.length}`);
             solve(answer, outPath, stats);
         }
     } else if (process.env.MODE.length === 5) {
@@ -76,8 +90,8 @@ async function main() {
     }
 
 
-    console.log(JSON.stringify(stats, null, 4));
-    appendFile(outPath, `\n\n${JSON.stringify(stats, null, 4)}\n`);
+    console.log(formatReport(stats));
+    appendFile(outPath, `\n\n${formatReport(stats)}\n`);
 
     console.log(`Result written to ${outPath}`);
     performance.mark("all-end");
