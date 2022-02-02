@@ -20,6 +20,7 @@ perfObserver.observe({ entryTypes: ["measure"], buffered: true });
 
 
 const { solver, name: solverName } = require('./solver');
+const { write } = require('fs');
 
 
 
@@ -57,6 +58,8 @@ async function main() {
         for (const answer of answers) {
             solve(answer, outPath);
         }
+    } else if (process.env.MODE.length === 5) {
+        solve(process.env.MODE, outPath);
     } else {
         const count = parseInt(process.env.MODE, 10);
         for (let i = 0; i < count; i++) {
@@ -64,8 +67,6 @@ async function main() {
             solve(answer, outPath);
         }
     }
-
-
 
 
     // solveLine('hello', 'hello');
@@ -80,21 +81,23 @@ async function main() {
 
 function solve(answer, outPath) {
     if (process.env.VERBOSE) console.log(`Solve: ${answer}`);
+    // writeFileExt('./allWords.txt', allWords.join('\n'));
 
+    const measureKey = `${solverName}: ${answer}`;
     performance.mark("measure-start");
 
     /** @type {string} */
     let result = solver(answer, allWords.slice(), solveLine, Number(process.env.TRIALS));
 
     performance.mark("measure-end");
-    performance.measure(`${solverName}: ${answer}`, "measure-start", "measure-end");
+    performance.measure(measureKey, "measure-start", "measure-end");
 
     if (lastWordOf(result) !== answer) {
         result = 'X';
     }
 
 
-    if (process.env.VERBOSE) console.log(`Result: ${result}`);
+    console.log(`Result (${result.split(',').length}): ${result}\n`);
     appendFile(outPath, result + '\n');
 }
 
@@ -146,9 +149,9 @@ function formatResult(result) {
         .replace(/2/g, '🟩');
 }
 
-function lastWordOf(result) {
-    var n = result.indexOf(",");
-    var res = result.substring(n + 1, -1);
+function lastWordOf(result = '') {
+    var n = result.lastIndexOf(",");
+    var res = result.substring(n + 1);
     return res;
 
 }
