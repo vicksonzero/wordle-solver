@@ -64,6 +64,7 @@ async function main() {
             `Solver: ${stats.solver}`,
             `Date: ${stats.date}`,
             `Total Guesses: ${stats.totalGuesses}`,
+            `Avg Guesses: ${(stats.totalGuesses / answers.length).toFixed(4)}`,
             `Shortest Guesses: ${stats.minGuesses}`,
             `Longest Guesses: ${stats.maxGuesses}`,
             `Fails: ${stats.fails}`,

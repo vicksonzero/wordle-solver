@@ -4,31 +4,27 @@ const { frequencyList } = require('../data/frequency');
 exports.name = 'naive solver with weighted choice';
 // Summary:
 // Solver: naive solver with weighted choice
-// Date: 2022_02_02T15_23_26
-// Total Guesses: 21280
+// Date: 2022_02_02T15_51_21
+// Total Guesses: 15110
+// Avg Guesses: 6.5270
 // Shortest Guesses: 2
-// Longest Guesses: 21
+// Longest Guesses: 23
 // Fails: 0
 // Guess Histogram:
-//   2: 4
-//   3: 26
-//   4: 52
-//   5: 116
-//   6: 205
-//   7: 277
-//   8: 311
-//   9: 328
-//   10: 284
-//   11: 238
-//   12: 181
-//   13: 130
-//   14: 58
-//   15: 59
-//   16: 19
-//   17: 15
-//   18: 9
-//   19: 2
-//   21: 1
+//   2: 11
+//   3: 64
+//   4: 239
+//   5: 420
+//   6: 506
+//   7: 439
+//   8: 299
+//   9: 164
+//   10: 94
+//   11: 47
+//   12: 21
+//   13: 9
+//   14: 1
+//   23: 1
 
 /**
  * @param {string} answer - 5-letter answer
@@ -89,6 +85,7 @@ exports.solver = function (answer, wordList, solveLine, trials = 6) {
             }
         }
 
+
         const yellowChar = [];
         for (let j = 0; j < 5; j++) { // for all guess letters in yellow
             if (feedback[j] === '1') {
@@ -112,6 +109,7 @@ exports.solver = function (answer, wordList, solveLine, trials = 6) {
             i++;
         }
 
+
         const whiteChar = [];
         for (let j = 0; j < 5; j++) { // for all guess letters in yellow
             if (feedback[j] === '0') {
@@ -120,16 +118,23 @@ exports.solver = function (answer, wordList, solveLine, trials = 6) {
         }
         if (process.env.VERBOSE_SOLVER) console.log(`whiteChar: ${whiteChar.join(',')}`)
         // do something about feedback: yellow 1
+        loopWhite:
         for (let i = 0; i < choices.length;) {
             const choice = choices[i];
 
             // white 0
             for (const char of whiteChar) {
                 const charIndex = choice.indexOf(char);
-                if (charIndex >= 0 && greenFeedback[charIndex] !== '2' && !yellowChar.includes(char)) {
-                    if (process.env.VERBOSE_SOLVER) console.log(`Throw3: ${choice} (has ${char})`)
-                    choices.splice(i, 1);
-                    break;
+                if (charIndex >= 0) {
+                    if (greenFeedback[charIndex] === '2') {
+                        if (process.env.VERBOSE_SOLVER) console.log(`DontThrow3: ${choice} (greenFeedback has ${char} on [${charIndex}])`)
+                    } else if (yellowChar.includes(char)) {
+                        if (process.env.VERBOSE_SOLVER) console.log(`DontThrow3: ${choice} (yellowChar has ${char})`)
+                    } else {
+                        if (process.env.VERBOSE_SOLVER) console.log(`Throw3: ${choice} (has ${char})`)
+                        choices.splice(i, 1);
+                        continue loopWhite;
+                    }
                 }
             }
             i++;
