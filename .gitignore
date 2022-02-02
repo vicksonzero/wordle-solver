@@ -1,6 +1,7 @@
 # App
 out/*
 !out/.gitkeep
+out.txt
 
 # Logs
 logs

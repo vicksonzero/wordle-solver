@@ -7,16 +7,14 @@ if (process.env.SILENT) {
     process.env.VERBOSE_SOLVER = '';
 }
 
-const fileNameDate = getDate();
-const outPath = process.env.OUT_FILE.replace('{date}', fileNameDate);
-const perfPath = process.env.PERF_FILE.replace('{date}', fileNameDate);
-
+// lib
 const { readFile, writeFile, appendFile } = require('fs/promises');
 const https = require('https');
 const seedrandom = require('seedrandom');
 const rng = seedrandom(process.env.SEED, { global: true });
 const { performance, PerformanceObserver } = require("perf_hooks")
 
+// init
 const perfObserver = new PerformanceObserver((items) => {
     items.getEntries().forEach((entry) => {
         appendFile(perfPath, JSON.stringify(entry, null, 4) + '\n');
@@ -27,8 +25,18 @@ const perfObserver = new PerformanceObserver((items) => {
 })
 perfObserver.observe({ entryTypes: ["measure"], buffered: true });
 
+// load solver
 const { solver, name: solverName } = require(process.env.SOLVER);
 console.log(`Using solver: ${process.env.SOLVER} (${solverName})`);
+
+// init file names
+const fileNameDate = getDate();
+const outPath = process.env.OUT_FILE
+    .replace('{date}', fileNameDate)
+    .replace('{solver}', solverName.replace(/[^a-zA-Z0-9_]/g, '_'));
+const perfPath = process.env.PERF_FILE
+    .replace('{date}', fileNameDate)
+    .replace('{solver}', solverName.replace(/[^a-zA-Z0-9_]/g, '_'));
 
 //#endregion
 
@@ -54,7 +62,7 @@ async function main() {
     if (process.env.MODE === 'all') {
         for (let i = 0; i < answers.length; i++) {
             const answer = answers[i];
-            console.log(`${i + 1}/${answers.length}`);
+            if ((i + 1) % 10 === 0) console.log(`${i + 1}/${answers.length}`);
             solve(answer, outPath, stats);
         }
     } else if (process.env.MODE.length === 5) {
@@ -68,11 +76,6 @@ async function main() {
     }
 
 
-    // solveLine('hello', 'hello');
-    // solveLine('hello', 'helno');
-    // solveLine('hello', 'heleo');
-    // solveLine('hello', 'helol');
-    // solveLine('hello', 'hwlol');
     console.log(JSON.stringify(stats, null, 4));
     appendFile(outPath, `\n\n${JSON.stringify(stats, null, 4)}\n`);
 
