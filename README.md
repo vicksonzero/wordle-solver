@@ -2,7 +2,7 @@
 Casual wordle solver. Not gonna be fast, i just want to make one, so that i can say i did one. 
 
 
-Going to submit to https://freshman.dev/wordle/#/leaderboard if it solves all questions without "X"
+Going to submit to https://freshman.dev/wordle/#/leaderboard if it solves all questions within the 6 attempts
 
 
 Project start: **2022-02-02 14:30 (UTC+8)**  
