@@ -27,8 +27,8 @@ const perfObserver = new PerformanceObserver((items) => {
 })
 perfObserver.observe({ entryTypes: ["measure"], buffered: true });
 
-
-const { solver, name: solverName } = require('./solver');
+const { solver, name: solverName } = require(process.env.SOLVER);
+console.log(`Using solver: ${process.env.SOLVER} (${solverName})`);
 
 //#endregion
 
@@ -42,11 +42,12 @@ async function main() {
     // writeFileExt('./allWords.txt', allWords.join('\n'));
 
     const stats = {
-        minSteps: allWords.length,
-        maxSteps: 0,
+        solver: solverName,
+        minGuesses: allWords.length,
+        maxGuesses: 0,
         fails: 0,
-        stepsCount: {},
-        totalSteps: 0,
+        guessesDetails: {},
+        totalGuesses: 0,
     };
 
 
@@ -122,11 +123,11 @@ function solve(answer, outPath, stats) {
     }
 
     const steps = result.split(',').length;
-    stats.minSteps = Math.min(stats.minSteps, steps);
-    stats.maxSteps = Math.max(stats.maxSteps, steps);
+    stats.minGuesses = Math.min(stats.minGuesses, steps);
+    stats.maxGuesses = Math.max(stats.maxGuesses, steps);
     stats.fails += result === 'X' ? 1 : 0;
-    stats.stepsCount[steps] = (stats.stepsCount[steps] || 0) + 1;
-    stats.totalSteps += steps;
+    stats.guessesDetails[steps] = (stats.guessesDetails[steps] || 0) + 1;
+    stats.totalGuesses += steps;
 
     if (!process.env.SILENT) console.log(`Result (${steps}): ${result}\n`);
     appendFile(outPath, result + '\n');

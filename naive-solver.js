@@ -2,10 +2,10 @@
 exports.name = 'naive solver';
 // performance (2022_02_02T10_34_35):
 // {
-//     "minSteps": 2,
-//     "maxSteps": 102,
+//     "minGuesses": 2,
+//     "maxGuesses": 102,
 //     "fails": 0,
-//     "totalSteps": 38582
+//     "totalGuesses": 38582
 // }
 
 /**
