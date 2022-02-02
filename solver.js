@@ -1,5 +1,5 @@
 //@ts-check
-
+exports.name = 'naive solver';
 exports.solver = function (answer, wordList, solveLine, trials) {
     let result = [];
     // setup

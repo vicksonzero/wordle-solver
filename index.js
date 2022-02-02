@@ -1,12 +1,25 @@
 //@ts-check
 require('dotenv').config();
 
+const fileNameDate = getDate();
+const outPath = process.env.OUT_FILE.replace('{date}', fileNameDate);
+const perfPath = process.env.PERF_FILE.replace('{date}', fileNameDate);
+
 const { readFile, writeFile, appendFile } = require('fs/promises');
 const https = require('https');
 const seedrandom = require('seedrandom');
 const rng = seedrandom(process.env.SEED, { global: true });
+const { performance, PerformanceObserver } = require("perf_hooks")
 
-const { solver } = require('./solver');
+const perfObserver = new PerformanceObserver((items) => {
+    items.getEntries().forEach((entry) => {
+        appendFile(perfPath, JSON.stringify(entry, null, 4) + '\n');
+    })
+})
+perfObserver.observe({ entryTypes: ["measure"], buffered: true });
+
+
+const { solver, name: solverName } = require('./solver');
 
 
 
@@ -39,25 +52,16 @@ async function setup() {
 async function main() {
     await setup();
 
-    const outPath = process.env.OUT_FILE.replace('{date}', getDate());
-
 
     if (process.env.MODE === 'all') {
         for (const answer of answers) {
-            if (process.env.VERBOSE) console.log(`Solve: ${answer}`);
-            const result = solve(answer);
-            if (process.env.VERBOSE) console.log(`Result: ${result}`);
-            appendFile(outPath, result + '\n');
+            solve(answer, outPath);
         }
     } else {
         const count = parseInt(process.env.MODE, 10);
-
         for (let i = 0; i < count; i++) {
             const answer = answers.splice(Math.floor(Math.random() * answers.length), 1)[0];
-            if (process.env.VERBOSE) console.log(`Solve: ${answer}`);
-            const result = solve(answer);
-            if (process.env.VERBOSE) console.log(`Result: ${result}`);
-            appendFile(outPath, result + '\n');
+            solve(answer, outPath);
         }
     }
 
@@ -74,15 +78,24 @@ async function main() {
 }
 
 
-function solve(answer) {
+function solve(answer, outPath) {
+    if (process.env.VERBOSE) console.log(`Solve: ${answer}`);
+
+    performance.mark("measure-start");
+
     /** @type {string} */
-    const result = solver(answer, allWords.slice(), solveLine, Number(process.env.TRIALS));
+    let result = solver(answer, allWords.slice(), solveLine, Number(process.env.TRIALS));
+
+    performance.mark("measure-end");
+    performance.measure(`${solverName}: ${answer}`, "measure-start", "measure-end");
 
     if (lastWordOf(result) !== answer) {
-        return 'X';
+        result = 'X';
     }
 
-    return result;
+
+    if (process.env.VERBOSE) console.log(`Result: ${result}`);
+    appendFile(outPath, result + '\n');
 }
 
 function solveLine(answer, guess) {

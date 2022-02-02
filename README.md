@@ -7,4 +7,19 @@ Going to submit to https://freshman.dev/wordle/#/leaderboard
 Instructions here: https://www.reddit.com/r/wordle/comments/s88iq4/a_wordle_bot_leaderboard/
 
 
-start: 2022-02-02 14:30 (UTC+8)
+Project start: 2022-02-02 14:30 (UTC+8)
+
+
+# Set up
+
+```
+git clone
+npm install
+node download.js
+```
+
+# To run app
+
+```
+node index.js
+```
