@@ -1,0 +1,23 @@
+{
+  "name": "wordle-solver",
+  "version": "1.0.0",
+  "description": "Casual wordle solver. Not gonna be fast, i just want to make one, so that i can say i did one.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vicksonzero/wordle-solver.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vicksonzero/wordle-solver/issues"
+  },
+  "homepage": "https://github.com/vicksonzero/wordle-solver#readme",
+  "dependencies": {
+    "dotenv": "^15.0.0"
+  }
+}
