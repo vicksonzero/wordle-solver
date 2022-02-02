@@ -1,0 +1,1 @@
+exports.frequencyList=["s","e","a","o","r","i","l","t","n","u","d","y","c","p","m","h","g","b","k","w","f","v","z","j","x","q"]
