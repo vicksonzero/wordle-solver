@@ -3,6 +3,8 @@ require('dotenv').config();
 
 const { readFile, writeFile, appendFile } = require('fs/promises');
 const https = require('https');
+const seedrandom = require('seedrandom');
+const rng = seedrandom(process.env.SEED, { global: true });
 
 const { solver } = require('./solver');
 
@@ -74,7 +76,7 @@ async function main() {
 
 function solve(answer) {
     /** @type {string} */
-    const result = solver(answer, solveLine, Number(process.env.TRIALS));
+    const result = solver(answer, allWords.slice(), solveLine, Number(process.env.TRIALS));
 
     if (lastWordOf(result) !== answer) {
         return 'X';
@@ -86,42 +88,50 @@ function solve(answer) {
 function solveLine(answer, guess) {
     answer = answer.split('');
     guess = guess.split('');
-    let feedback = '⬜⬜⬜⬜⬜'.split('');// 🟩🟨⬜
+    let feedback = '00000'.split(''); // 🟩🟨⬜ 210
     let used = [0, 0, 0, 0, 0];
 
 
-    // green 🟩
+    // green 2
     for (let i = 0; i < 5; i++) {
         if (answer[i] === guess[i]) {
-            feedback[i] = '🟩';
+            feedback[i] = '2';
             used[i] = 1;
         }
     }
 
-    // yellow 🟨
+    // yellow 1
     for (let i = 0; i < 5; i++) { // for each guess:
-        if (feedback[i] === '🟩') continue; // skip green guess
+        if (feedback[i] === '2') continue; // skip green guess
 
-        // else: result[i] == 🟨 or ⬜
+        // else: result[i] == 1 or 0
         for (let j = 0; j < 5; j++) { // for each guess, match against unused answers:
             if (used[j] === 1) continue; // skip used answer
 
             if (answer[j] === guess[i]) { // this guess matches an unused answer
                 // @ts-ignore
-                feedback[i] = '🟨';
+                feedback[i] = '1';
                 used[j] = 1;
             }
         }
     }
 
-    // else they are white ⬜
+    // else they are white 0
 
 
-    if (process.env.VERBOSE) console.log(` - solveLine(${answer.join('')}, ${guess.join('')}) = ${feedback.join('')}`);
+    if (process.env.VERBOSE) console.log(` - solveLine(${formatResult(answer)}, ${formatResult(guess)}) = ${formatResult(feedback)}`);
     return feedback.join('');
 }
 
 // UTILS
+
+function formatResult(result) {
+    // 🟩🟨⬜ 210
+    return result.join('')
+        .replace(/0/g, '⬜')
+        .replace(/1/g, '🟨')
+        .replace(/2/g, '🟩');
+}
 
 function lastWordOf(result) {
     var n = result.indexOf(",");

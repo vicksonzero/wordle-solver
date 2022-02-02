@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/vicksonzero/wordle-solver#readme",
   "dependencies": {
-    "dotenv": "^15.0.0"
+    "dotenv": "^15.0.0",
+    "seedrandom": "^3.0.5"
   }
 }
