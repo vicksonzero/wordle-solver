@@ -66,6 +66,7 @@ async function main() {
         maxSteps: 0,
         fails: 0,
         stepsCount: {},
+        totalSteps: 0,
     };
 
 
@@ -122,6 +123,7 @@ function solve(answer, outPath, stats) {
     stats.maxSteps = Math.max(stats.maxSteps, steps);
     stats.fails += result === 'X' ? 1 : 0;
     stats.stepsCount[steps] = (stats.stepsCount[steps] || 0) + 1;
+    stats.totalSteps += steps;
 
     if (!process.env.SILENT) console.log(`Result (${steps}): ${result}\n`);
     appendFile(outPath, result + '\n');
