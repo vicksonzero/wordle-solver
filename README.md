@@ -18,6 +18,8 @@ npm install
 node download.js
 ```
 
+Set up `.env` file
+
 # To run app
 
 ```

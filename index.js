@@ -80,7 +80,7 @@ async function main() {
         solve(process.env.MODE, outPath, stats);
     } else {
         const count = parseInt(process.env.MODE, 10);
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; answers.length > 0 && i < count; i++) {
             const answer = answers.splice(Math.floor(Math.random() * answers.length), 1)[0];
             solve(answer, outPath, stats);
         }
