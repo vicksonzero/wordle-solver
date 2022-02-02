@@ -1,5 +1,9 @@
 //@ts-check
 require('dotenv').config();
+if (process.env.SILENT) {
+    process.env.VERBOSE = '';
+    process.env.VERBOSE_SOLVER = '';
+}
 
 const fileNameDate = getDate();
 const outPath = process.env.OUT_FILE.replace('{date}', fileNameDate);
@@ -14,6 +18,9 @@ const { performance, PerformanceObserver } = require("perf_hooks")
 const perfObserver = new PerformanceObserver((items) => {
     items.getEntries().forEach((entry) => {
         appendFile(perfPath, JSON.stringify(entry, null, 4) + '\n');
+        if (entry.name == 'all') {
+            console.log(entry);
+        }
     })
 })
 perfObserver.observe({ entryTypes: ["measure"], buffered: true });
@@ -51,20 +58,30 @@ async function setup() {
 
 
 async function main() {
+    performance.mark("all-start");
     await setup();
+
+    const stats = {
+        minSteps: allWords.length,
+        maxSteps: 0,
+        fails: 0,
+        stepsCount: {},
+    };
 
 
     if (process.env.MODE === 'all') {
-        for (const answer of answers) {
-            solve(answer, outPath);
+        for (let i = 0; i < answers.length; i++) {
+            const answer = answers[i];
+            console.log(`${i + 1}/${answers.length}`);
+            solve(answer, outPath, stats);
         }
     } else if (process.env.MODE.length === 5) {
-        solve(process.env.MODE, outPath);
+        solve(process.env.MODE, outPath, stats);
     } else {
         const count = parseInt(process.env.MODE, 10);
         for (let i = 0; i < count; i++) {
             const answer = answers.splice(Math.floor(Math.random() * answers.length), 1)[0];
-            solve(answer, outPath);
+            solve(answer, outPath, stats);
         }
     }
 
@@ -74,12 +91,16 @@ async function main() {
     // solveLine('hello', 'heleo');
     // solveLine('hello', 'helol');
     // solveLine('hello', 'hwlol');
+    console.log(JSON.stringify(stats, null, 4));
+    appendFile(outPath, `\n\n${JSON.stringify(stats, null, 4)}\n`);
 
     console.log(`Result written to ${outPath}`);
+    performance.mark("all-end");
+    performance.measure('all', "all-start", "all-end");
 }
 
 
-function solve(answer, outPath) {
+function solve(answer, outPath, stats) {
     if (process.env.VERBOSE) console.log(`Solve: ${answer}`);
     // writeFileExt('./allWords.txt', allWords.join('\n'));
 
@@ -96,8 +117,13 @@ function solve(answer, outPath) {
         result = 'X';
     }
 
+    const steps = result.split(',').length;
+    stats.minSteps = Math.min(stats.minSteps, steps);
+    stats.maxSteps = Math.max(stats.maxSteps, steps);
+    stats.fails += result === 'X' ? 1 : 0;
+    stats.stepsCount[steps] = (stats.stepsCount[steps] || 0) + 1;
 
-    console.log(`Result (${result.split(',').length}): ${result}\n`);
+    if (!process.env.SILENT) console.log(`Result (${steps}): ${result}\n`);
     appendFile(outPath, result + '\n');
 }
 
